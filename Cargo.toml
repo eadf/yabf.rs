@@ -1,0 +1,11 @@
+[package]
+name = "yabf"
+version = "0.0.1"
+authors = ["eadf"]
+edition = "2018"
+description = "work in progress"
+readme = "README.md"
+repository = "https://github.com/eadf/yabf.rs"
+license = "MIT OR Apache-2.0"
+
+[dependencies]

@@ -1,0 +1,24 @@
+name: Clippy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: install nightly
+      run : rustup toolchain install nightly
+    - name: install clippy
+      run : rustup +nightly component add clippy
+    - name: Run clippy
+      run: cargo +nightly clippy
