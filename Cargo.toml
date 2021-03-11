@@ -21,9 +21,14 @@ rand = "^0.8.3"
 rand_chacha = "^0.3.0"
 itertools = "^0.10.0"
 num-bigint = "^0.4.0"
+criterion = "^0.3.4"
 
 [features]
 impl_smallvec = ["smallvec"]
 extend_one = []
 
 default = ["impl_smallvec", "extend_one"]
+
+[[bench]]
+name = "bench"
+harness = false

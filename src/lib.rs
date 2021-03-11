@@ -1,4 +1,3 @@
-#![feature(test)]
 #![deny(non_camel_case_types)]
 #![deny(unused_parens)]
 #![deny(non_upper_case_globals)]
@@ -6,10 +5,6 @@
 #![deny(unused_results)]
 #![deny(unused_imports)]
 #![allow(unused_imports)]
-#![feature(hash_drain_filter)]
-
-#[cfg(test)]
-mod bench;
 
 use core::fmt;
 
