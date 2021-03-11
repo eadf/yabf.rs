@@ -11,15 +11,19 @@
 #[cfg(test)]
 mod bench;
 
-///! Yet another bit field implementation.
-///! This is a simple, small and hopefully efficient bit field implementation.
 use core::fmt;
 
 #[derive(Clone)]
+/// Yet another bit field implementation.
+/// This is a simple, small and hopefully efficient bit field implementation.
+///
+/// It is intended for cases where a program iterates over list or other usize indexed containers
+/// and simple bit based bookkeeping is required.
+///
 pub struct Yabf {
-    #[cfg(not(feature="impl_smallvec"))]
+    #[cfg(not(feature = "impl_smallvec"))]
     internals: Vec<u32>,
-    #[cfg(feature="impl_smallvec")]
+    #[cfg(feature = "impl_smallvec")]
     internals: smallvec::SmallVec<[u32; 4]>,
 }
 
@@ -40,10 +44,10 @@ impl Yabf {
     /// ```
     pub fn with_capacity(bits: usize) -> Self {
         Self {
-            #[cfg(not(feature="impl_smallvec"))]
-            internals: Vec::<u32>::with_capacity((bits / 32)+1),
-            #[cfg(feature="impl_smallvec")]
-            internals: smallvec::SmallVec::<[u32; 4]>::with_capacity((bits / 32)+1),
+            #[cfg(not(feature = "impl_smallvec"))]
+            internals: Vec::<u32>::with_capacity((bits / 32) + 1),
+            #[cfg(feature = "impl_smallvec")]
+            internals: smallvec::SmallVec::<[u32; 4]>::with_capacity((bits / 32) + 1),
         }
     }
 
@@ -94,10 +98,11 @@ impl Yabf {
                 self.internals.extend_reserve(word-self.internals.capacity());
             }
         }*/
-        #[cfg(not(feature="impl_smallvec"))]
+        #[cfg(not(feature = "impl_smallvec"))]
         if word >= self.internals.len() {
             if self.internals.capacity() < word {
-                self.internals.reserve_exact(word-self.internals.capacity());
+                self.internals
+                    .reserve_exact(word - self.internals.capacity());
             }
         }
 
@@ -120,7 +125,7 @@ impl Yabf {
         }
     }
 
-    /// Returns `true` if all bits are `false`
+    /// Returns `true` if all bits are set to `false`
     #[inline]
     pub fn is_empty(&self) -> bool {
         for e in self.internals.iter() {
@@ -148,21 +153,29 @@ impl Yabf {
         let additional = if additional < 1 { 1 } else { additional };
         self.internals.reserve(additional);
     }
+
+    /// Remove all elements from the vector.
+    /// This method simply delegates clear() to the underlying vector
+    /// std::vec::Vec or smallvec::SmallVec. So what actually happen depends on the
+    /// feature set.
+    #[inline]
+    pub fn clear(&mut self) {
+        self.internals.clear();
+    }
 }
 
-/// Iterator over the bits in the bit field container.
+/// Iterator over the bits set to true in the bit field container.
 /// Will iterate over the bits from lowest to to highest.
 #[derive(Clone)]
 pub struct YabfIterator<'s> {
     yabf: &'s Yabf,
     last_word: usize,
     // when this field is u16::MAX it means that the value was not
-    // actually the 'last' value yet.
+    // actually the 'last' value yet, but rather that the bit 0 should be tested.
     last_bit: u16,
 }
 
 impl<'s> YabfIterator<'s> {
-    //#[allow(dead_code)]
     pub(crate) fn new(yabf: &'s Yabf) -> Self {
         Self {
             yabf,
@@ -201,14 +214,15 @@ impl<'s> Iterator for YabfIterator<'s> {
             if next_bit > 31 {
                 next_bit = 0;
                 next_word += 1;
-                if next_word > self.yabf.internals.len() - 1 {
+                if next_word >= self.yabf.internals.len() {
                     return None;
                 }
             }
             let sample = self.yabf.internals[next_word];
+            // Skip if all bits are zero
             if sample == 0 {
                 next_word += 1;
-                if next_word > self.yabf.internals.len() - 1 {
+                if next_word >= self.yabf.internals.len() {
                     return None;
                 }
                 next_bit = 0;
@@ -221,7 +235,7 @@ impl<'s> Iterator for YabfIterator<'s> {
             // Skip if the high 16 bits are all zero
             if next_bit >= 16 && sample & 0xFFFF0000 == 0 {
                 next_word += 1;
-                if next_word > self.yabf.internals.len() - 1 {
+                if next_word >= self.yabf.internals.len() {
                     return None;
                 }
                 next_bit = 0;
@@ -259,9 +273,9 @@ impl Default for Yabf {
     #[inline]
     fn default() -> Self {
         Self {
-            #[cfg(not(feature="impl_smallvec"))]
+            #[cfg(not(feature = "impl_smallvec"))]
             internals: Vec::<u32>::default(),
-            #[cfg(feature="impl_smallvec")]
+            #[cfg(feature = "impl_smallvec")]
             internals: smallvec::SmallVec::<[u32; 4]>::default(),
         }
     }
@@ -271,7 +285,7 @@ impl Default for Yabf {
 mod test {
 
     #[test]
-    #[cfg(feature="impl_smallvec")]
+    #[cfg(feature = "impl_smallvec")]
     fn test_capacity_0() {
         let mut bf = crate::Yabf::default();
 
@@ -305,7 +319,7 @@ mod test {
     fn test_capacity_2() {
         let mut bf = crate::Yabf::default();
         assert!(bf.is_empty());
-        #[cfg(feature="impl_smallvec")]
+        #[cfg(feature = "impl_smallvec")]
         assert_eq!(bf.capacity(), 4 * 32);
         bf.set_bit(129, true);
         bf.reserve(10);
