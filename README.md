@@ -2,7 +2,7 @@
 [![Documentation](https://docs.rs/yabf/badge.svg)](https://docs.rs/yabf)
 [![Workflow](https://github.com/eadf/yabf.rs/workflows/Rust/badge.svg)](https://github.com/eadf/yabf.rs/workflows/Rust/badge.svg)
 [![Workflow](https://github.com/eadf/yabf.rs/workflows/Clippy/badge.svg)](https://github.com/eadf/yabf.rs/workflows/Clippy/badge.svg)
-[![dependency status](https://deps.rs/crate/yabf/0.0.2/status.svg)](https://deps.rs/crate/yabf/0.0.2)
+[![dependency status](https://deps.rs/crate/yabf/0.0.3/status.svg)](https://deps.rs/crate/yabf/0.0.3)
 
 # Yabf
 Just what the world needed - yet another bit field struct.
@@ -18,11 +18,11 @@ stack allocated if it contains less than 129 bits.
 ## Rust cargo
 Use with std::vec::Vec. Vec is slightly faster for larger bit fields
 ```cargo
-yabf = {version="^0.0.2",default-features=false}
+yabf = {version="^0.0.3",default-features=false}
 ```
 Use with smallvec::SmallVec. SmallVec can be stack allocated for really small bit fields
 ```cargo
-yabf = {version="^0.0.2"}
+yabf = {version="^0.0.3"}
 ```
 
 ## License
