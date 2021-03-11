@@ -1,23 +1,29 @@
 [package]
 name = "yabf"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["eadf"]
 edition = "2018"
-description = "work in progress"
+description = "yet another bit field"
 readme = "README.md"
 repository = "https://github.com/eadf/yabf.rs"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-smallvec = "^1.6.1"
+smallvec = { version = "^1.6.1", optional = true }
 
 [[example]]
 name = "stress_test"
 path = "src/stress_test.rs"
 
 [dev-dependencies]
-fnv = "1.0.7"
-rand = "0.8.3"
-rand_chacha = "0.3.0"
-itertools = "0.10.0"
-num-bigint = "0.4.0"
+fnv = "^1.0.7"
+rand = "^0.8.3"
+rand_chacha = "^0.3.0"
+itertools = "^0.10.0"
+num-bigint = "^0.4.0"
+
+[features]
+impl_smallvec = ["smallvec"]
+extend_one = []
+
+default = ["impl_smallvec", "extend_one"]

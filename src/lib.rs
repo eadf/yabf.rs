@@ -17,6 +17,9 @@ use core::fmt;
 
 #[derive(Clone)]
 pub struct Yabf {
+    #[cfg(not(feature="impl_smallvec"))]
+    internals: Vec<u32>,
+    #[cfg(feature="impl_smallvec")]
     internals: smallvec::SmallVec<[u32; 4]>,
 }
 
@@ -37,7 +40,10 @@ impl Yabf {
     /// ```
     pub fn with_capacity(bits: usize) -> Self {
         Self {
-            internals: smallvec::SmallVec::<[u32; 4]>::with_capacity(bits / 32),
+            #[cfg(not(feature="impl_smallvec"))]
+            internals: Vec::<u32>::with_capacity((bits / 32)+1),
+            #[cfg(feature="impl_smallvec")]
+            internals: smallvec::SmallVec::<[u32; 4]>::with_capacity((bits / 32)+1),
         }
     }
 
@@ -80,6 +86,20 @@ impl Yabf {
     /// ```
     pub fn set_bit(&mut self, n: usize, state: bool) {
         let word = n / 32;
+
+        /* THIS DOES NOT WORK!!!
+        #[cfg(all(feature="impl_smallvec",feature="extend_one"))]
+        if word >= self.internals.len() {
+            if self.internals.capacity() < word {
+                self.internals.extend_reserve(word-self.internals.capacity());
+            }
+        }*/
+        #[cfg(not(feature="impl_smallvec"))]
+        if word >= self.internals.len() {
+            if self.internals.capacity() < word {
+                self.internals.reserve_exact(word-self.internals.capacity());
+            }
+        }
 
         if self.internals.is_empty() {
             // prime the array so that the math works
@@ -239,6 +259,9 @@ impl Default for Yabf {
     #[inline]
     fn default() -> Self {
         Self {
+            #[cfg(not(feature="impl_smallvec"))]
+            internals: Vec::<u32>::default(),
+            #[cfg(feature="impl_smallvec")]
             internals: smallvec::SmallVec::<[u32; 4]>::default(),
         }
     }
@@ -248,6 +271,7 @@ impl Default for Yabf {
 mod test {
 
     #[test]
+    #[cfg(feature="impl_smallvec")]
     fn test_capacity_0() {
         let mut bf = crate::Yabf::default();
 
@@ -281,6 +305,7 @@ mod test {
     fn test_capacity_2() {
         let mut bf = crate::Yabf::default();
         assert!(bf.is_empty());
+        #[cfg(feature="impl_smallvec")]
         assert_eq!(bf.capacity(), 4 * 32);
         bf.set_bit(129, true);
         bf.reserve(10);

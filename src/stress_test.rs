@@ -17,6 +17,12 @@ fn main() {
     let mut loop_number = 0;
     let max_size = 14;
     let min_size = 7;
+
+    #[cfg(feature="impl_smallvec")]
+    println!("running stress test with Smallvec");
+    #[cfg(not(feature="impl_smallvec"))]
+    println!("running stress test with std::Vec");
+
     loop {
         loop_number += 1;
 
@@ -84,9 +90,8 @@ fn main() {
                    q.into_iter().collect::<Vec<usize>>());
 
         println!(
-            "**** loop {}, transactions {} ***** ",
-            loop_number, transactions
+            "**** loop {}, transactions {} ***** vec.capacity {}",
+            loop_number, transactions, q.capacity()
         );
-        assert!(q.capacity() < 5000);
     }
 }
