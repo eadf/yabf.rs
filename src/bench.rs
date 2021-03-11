@@ -11,7 +11,7 @@ fn bench_1(b: &mut Bencher) {
     #[cfg(feature="impl_smallvec")]
     println!("running bench with Smallvec");
     #[cfg(not(feature="impl_smallvec"))]
-    println!("running bench with std::Vec");
+    println!("running bench with std::vec::Vec");
 
     let mut bf = Yabf::default();
     b.iter(move || {

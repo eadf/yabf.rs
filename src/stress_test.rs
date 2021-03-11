@@ -21,7 +21,7 @@ fn main() {
     #[cfg(feature="impl_smallvec")]
     println!("running stress test with Smallvec");
     #[cfg(not(feature="impl_smallvec"))]
-    println!("running stress test with std::Vec");
+    println!("running stress test with std::vec::Vec");
 
     loop {
         loop_number += 1;
