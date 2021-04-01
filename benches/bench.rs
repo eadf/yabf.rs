@@ -31,7 +31,7 @@ fn bench_1(c: &mut Criterion) {
     });
 }
 
-// BigUint bench: time: [13.838 ms 13.850 ms 13.866 ms] 
+// BigUint bench: time: [13.838 ms 13.850 ms 13.866 ms]
 // This is unfair comparison, BigUint do shrink resizing when needed.
 #[cfg(test)]
 fn bench_2(c: &mut Criterion) {

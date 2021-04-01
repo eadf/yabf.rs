@@ -2,13 +2,16 @@ extern crate rand;
 extern crate rand_chacha;
 
 use fnv::FnvHashSet;
-use rand::{Rng, SeedableRng};
-use yabf::Yabf;
 use itertools::Itertools;
+use rand::{Rng, SeedableRng};
+use yabf::{SmallYabf, Yabf};
 
 fn main() {
     let mut rng = rand_chacha::ChaCha8Rng::seed_from_u64(38);
     let mut q = Yabf::with_capacity(1024);
+    #[cfg(feature = "impl_smallvec")]
+    let mut q1 = SmallYabf::with_capacity(1024);
+
     let mut in_q = FnvHashSet::<usize>::default();
     let mut to_add = FnvHashSet::<usize>::default();
     let mut to_del = FnvHashSet::<usize>::default();
@@ -18,10 +21,9 @@ fn main() {
     let max_size = 14;
     let min_size = 7;
 
-    #[cfg(feature="impl_smallvec")]
-    println!("running stress test with Smallvec");
-    #[cfg(not(feature="impl_smallvec"))]
     println!("running stress test with std::vec::Vec");
+    #[cfg(feature = "impl_smallvec")]
+    println!("...and with Smallvec");
 
     loop {
         loop_number += 1;
@@ -55,6 +57,8 @@ fn main() {
         println!("Adding {:?}", to_add);
         for key in to_add.iter() {
             q.set_bit(*key, true);
+            #[cfg(feature = "impl_smallvec")]
+            q1.set_bit(*key, true);
             in_q.insert(*key);
         }
 
@@ -64,6 +68,14 @@ fn main() {
             if q.bit(*key) {
                 println!("Error: {} should not be set", key);
                 panic!();
+            }
+            #[cfg(feature = "impl_smallvec")]
+            {
+                q1.set_bit(*key, false);
+                if q1.bit(*key) {
+                    println!("Error: {} should not be set", key);
+                    panic!();
+                }
             }
             in_q.remove(key);
         }
@@ -76,6 +88,12 @@ fn main() {
                 println!("{:?}", q);
                 panic!();
             }
+            #[cfg(feature = "impl_smallvec")]
+            if !q1.bit(*key) {
+                println!("Error: {} was not set", key);
+                println!("{:?}", q);
+                panic!();
+            }
             let another_key = key + 1;
             if !in_q.contains(&another_key) {
                 if q.bit(another_key) {
@@ -83,15 +101,36 @@ fn main() {
                     println!("{:?}", q);
                     panic!();
                 }
+                #[cfg(feature = "impl_smallvec")]
+                if q1.bit(another_key) {
+                    println!("Error: {} should not be set", another_key);
+                    println!("{:?}", q);
+                    panic!();
+                }
             }
         }
 
-        assert_eq!(in_q.iter().sorted_unstable().map(|x|*x).collect::<Vec<usize>>(),
-                   q.into_iter().collect::<Vec<usize>>());
+        assert_eq!(
+            in_q.iter()
+                .sorted_unstable()
+                .map(|x| *x)
+                .collect::<Vec<usize>>(),
+            q.into_iter().collect::<Vec<usize>>()
+        );
 
+        #[cfg(feature = "impl_smallvec")]
+        assert_eq!(
+            in_q.iter()
+                .sorted_unstable()
+                .map(|x| *x)
+                .collect::<Vec<usize>>(),
+            q1.into_iter().collect::<Vec<usize>>()
+        );
         println!(
             "**** loop {}, transactions {} ***** vec.capacity {}",
-            loop_number, transactions, q.capacity()
+            loop_number,
+            transactions,
+            q.capacity()
         );
     }
 }
