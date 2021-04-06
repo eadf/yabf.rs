@@ -4,7 +4,9 @@ extern crate rand_chacha;
 use fnv::FnvHashSet;
 use itertools::Itertools;
 use rand::{Rng, SeedableRng};
-use yabf::{SmallYabf, Yabf};
+#[cfg(feature = "impl_smallvec")]
+use yabf::SmallYabf;
+use yabf::Yabf;
 
 fn main() {
     let mut rng = rand_chacha::ChaCha8Rng::seed_from_u64(38);
@@ -126,11 +128,19 @@ fn main() {
                 .collect::<Vec<usize>>(),
             q1.into_iter().collect::<Vec<usize>>()
         );
-        println!(
-            "**** loop {}, transactions {} ***** vec.capacity {}",
+        print!(
+            "**** loop {}, transactions {} ***** vec.len {} vec.capacity {}",
             loop_number,
             transactions,
+            q.internal_len(),
             q.capacity()
         );
+        #[cfg(feature = "impl_smallvec")]
+        print!(
+            "  smallvec.len {} smallvec.capacity {}",
+            q1.internal_len(),
+            q1.capacity()
+        );
+        println!();
     }
 }

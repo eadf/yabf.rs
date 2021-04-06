@@ -7,6 +7,7 @@
 #![allow(unused_imports)]
 
 use core::fmt;
+use std::ops;
 
 #[derive(Clone)]
 /// Yet another bit field implementation.
@@ -78,9 +79,9 @@ impl Yabf {
     pub fn set_bit(&mut self, n: usize, state: bool) {
         let word = n / 32;
 
-        if word >= self.internals.len() && self.internals.capacity() < word {
+        if word >= self.internals.capacity() {
             self.internals
-                .reserve_exact(word - self.internals.capacity());
+                .reserve_exact(1 + word - self.internals.capacity());
         }
 
         if self.internals.is_empty() {
@@ -117,6 +118,12 @@ impl Yabf {
     #[inline]
     pub fn capacity(&self) -> usize {
         self.internals.capacity() * 32
+    }
+
+    /// The len() of the internal vector
+    #[inline]
+    pub fn internal_len(&self) -> usize {
+        self.internals.len()
     }
 
     /// Reserve capacity for `additional_bits` more bits to be inserted.
@@ -255,6 +262,46 @@ impl Default for Yabf {
     }
 }
 
+/// bit or assign operation
+/// ```
+/// # use yabf::Yabf;
+///
+/// let mut a = Yabf::default();
+/// let mut b = Yabf::default();
+/// a.set_bit(45,true);
+/// b.set_bit(12345,true);
+/// assert!(!a.bit(12345));
+/// assert!(a.bit(45));
+/// a |= &b;
+/// assert!(a.bit(12345));
+/// assert!(a.bit(45));
+/// ```
+impl ops::BitOrAssign<&Yabf> for Yabf {
+    fn bitor_assign(&mut self, other: &Yabf) {
+        if self.internals.len() < other.internals.len() {
+            for v in other
+                .internals
+                .iter()
+                .enumerate()
+                .take(self.internals.len())
+            {
+                self.internals[v.0] |= v.1;
+            }
+            if other.internals.len() > self.internals.capacity() {
+                self.internals
+                    .reserve_exact(other.internals.len() - self.internals.capacity());
+            }
+            for v in other.internals.iter().skip(self.internals.len()) {
+                self.internals.push(*v);
+            }
+        } else {
+            for v in other.internals.iter().enumerate() {
+                self.internals[v.0] |= v.1;
+            }
+        }
+    }
+}
+
 #[derive(Clone)]
 /// Yet another bit field implementation.
 /// This is a simple, small and hopefully efficient bit field implementation. It uses SmallVec
@@ -335,6 +382,7 @@ impl SmallYabf {
         let bit_mask = 1_u32 << (n % 32);
 
         if word >= self.internals.len() {
+            self.internals.reserve(1 + word - self.internals.len());
             let old_word = self.internals.len() - 1;
             for _i in old_word..word - 1 {
                 self.internals.push(0);
@@ -364,6 +412,12 @@ impl SmallYabf {
         self.internals.capacity() * 32
     }
 
+    /// The len() of the internal vector
+    #[inline]
+    pub fn internal_len(&self) -> usize {
+        self.internals.len()
+    }
+
     /// Reserve capacity for `additional_bits` more bits to be inserted.
     ///
     /// May reserve more space to avoid frequent re-allocations.
@@ -386,6 +440,7 @@ impl SmallYabf {
     }
 }
 
+#[cfg(feature = "impl_smallvec")]
 /// Iterator over the bits set to true in the bit field container.
 /// Will iterate over the bits from lowest to to highest.
 #[derive(Clone)]
@@ -397,6 +452,7 @@ pub struct SmallYabfIterator<'s> {
     last_bit: usize,
 }
 
+#[cfg(feature = "impl_smallvec")]
 impl<'s> SmallYabfIterator<'s> {
     pub(crate) fn new(yabf: &'s SmallYabf) -> Self {
         Self {
@@ -407,6 +463,7 @@ impl<'s> SmallYabfIterator<'s> {
     }
 }
 
+#[cfg(feature = "impl_smallvec")]
 impl<'a> IntoIterator for &'a SmallYabf {
     type Item = usize;
     type IntoIter = SmallYabfIterator<'a>;
@@ -416,6 +473,7 @@ impl<'a> IntoIterator for &'a SmallYabf {
     }
 }
 
+#[cfg(feature = "impl_smallvec")]
 impl<'s> Iterator for SmallYabfIterator<'s> {
     type Item = usize;
 
@@ -477,6 +535,7 @@ impl<'s> Iterator for SmallYabfIterator<'s> {
     }
 }
 
+#[cfg(feature = "impl_smallvec")]
 impl fmt::Debug for SmallYabf {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.internals.is_empty() {
@@ -491,6 +550,7 @@ impl fmt::Debug for SmallYabf {
     }
 }
 
+#[cfg(feature = "impl_smallvec")]
 impl Default for SmallYabf {
     #[inline]
     fn default() -> Self {
@@ -500,30 +560,49 @@ impl Default for SmallYabf {
     }
 }
 
+#[cfg(feature = "impl_smallvec")]
+/// bit or assign operation
+/// ```
+/// # use yabf::SmallYabf;
+///
+/// let mut a = SmallYabf::default();
+/// let mut b = SmallYabf::default();
+/// a.set_bit(45,true);
+/// b.set_bit(12345,true);
+/// assert!(!a.bit(12345));
+/// assert!(a.bit(45));
+/// a |= &b;
+/// assert!(a.bit(12345));
+/// assert!(a.bit(45));
+/// ```
+impl ops::BitOrAssign<&SmallYabf> for SmallYabf {
+    fn bitor_assign(&mut self, other: &SmallYabf) {
+        if self.internals.len() < other.internals.len() {
+            for v in other
+                .internals
+                .iter()
+                .enumerate()
+                .take(self.internals.len())
+            {
+                self.internals[v.0] |= v.1;
+            }
+            if other.internals.len() > self.internals.capacity() {
+                self.internals
+                    .reserve_exact(other.internals.len() - self.internals.capacity());
+            }
+            for v in other.internals.iter().skip(self.internals.len()) {
+                self.internals.push(*v);
+            }
+        } else {
+            for v in other.internals.iter().enumerate() {
+                self.internals[v.0] |= v.1;
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
-
-    #[test]
-    fn test_capacity_0() {
-        let mut bf = crate::Yabf::default();
-
-        assert!(bf.is_empty());
-        bf.set_bit(30 + 32 * 0, true);
-        assert_eq!(bf.bit(30 + 32 * 0), true);
-        assert_eq!(bf.capacity(), 4 * 32);
-        bf.set_bit(30 + 32 * 1, true);
-        assert_eq!(bf.bit(30 + 32 * 1), true);
-        assert_eq!(bf.capacity(), 4 * 32);
-        bf.set_bit(30 + 32 * 2, true);
-        assert_eq!(bf.bit(30 + 32 * 2), true);
-        assert_eq!(bf.capacity(), 4 * 32);
-        bf.set_bit(30 + 32 * 3, true);
-        assert_eq!(bf.bit(30 + 32 * 3), true);
-        assert_eq!(bf.capacity(), 4 * 32);
-        bf.set_bit(30 + 32 * 4, true);
-        assert_eq!(bf.bit(30 + 32 * 4), true);
-        assert!(bf.capacity() >= 5 * 32);
-    }
 
     #[test]
     fn test_capacity_1() {
@@ -550,6 +629,34 @@ mod test {
         bf.set_bit(29, true);
         bf.set_bit(167, true);
         println!("{:?}", bf.into_iter().collect::<Vec<usize>>());
+    }
+
+    #[test]
+    fn test_or() {
+        let mut a = crate::Yabf::default();
+        let mut b = crate::Yabf::default();
+        a.set_bit(45, true);
+        b.set_bit(44, true);
+        b.set_bit(4444, true);
+        assert!(a.bit(45));
+        assert!(!a.bit(44));
+        assert!(!a.bit(4444));
+        a |= &b;
+        assert!(a.bit(45));
+        assert!(a.bit(44));
+        assert!(a.bit(4444));
+
+        let mut b = crate::Yabf::default();
+        b.set_bit(23, true);
+        assert!(!a.bit(23));
+        assert!(a.bit(45));
+        //println!("{:?}",a);
+        a |= &b;
+        //println!("{:?}",a);
+        assert!(a.bit(23));
+        assert!(a.bit(45));
+        assert!(a.bit(44));
+        assert!(a.bit(4444));
     }
 }
 
