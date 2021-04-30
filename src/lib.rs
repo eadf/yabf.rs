@@ -1,3 +1,38 @@
+//! # Yabf
+//! Just what the world needed - yet another bit field struct.
+//!
+//! This is a small and simple implementation. It only has the basic functionality of a bit field:
+//!  * Set arbitary bit (if you set the millionth bit the list will use at least 125KB of heap space)
+//!  * Get bit value
+//!  * An iterator over the set bit indices. O(size of container)
+//!  * The container never shrinks.
+//!
+//! The bits are stored in plain (non-sparse) arrays/vectors.
+//!
+//! ```{rust}
+//! use yabf::Yabf;
+//! let mut a = Yabf::default();
+//! let mut b = Yabf::with_capacity(12345);
+//! a.set_bit(45,true);
+//! b.set_bit(12345,true);
+//! assert!(!a.bit(12345));
+//! assert!(a.bit(45));
+//! assert!(b.bit(12345));
+//! ```
+//!
+//! ```{rust}
+//!# #[cfg(feature = "impl_smallvec")] {
+//! use yabf::SmallYabf;
+//! let mut a = SmallYabf::default();
+//! let mut b = SmallYabf::with_capacity(12345);
+//! a.set_bit(45,true);
+//! b.set_bit(12345,true);
+//! assert!(!a.bit(12345));
+//! assert!(a.bit(45));
+//! assert!(b.bit(12345));
+//!# }
+//! ```
+
 #![deny(non_camel_case_types)]
 #![deny(unused_parens)]
 #![deny(non_upper_case_globals)]
@@ -8,6 +43,7 @@
 
 use core::fmt;
 use std::ops;
+
 
 #[derive(Clone)]
 /// Yet another bit field implementation.
@@ -23,9 +59,6 @@ pub struct Yabf {
 impl Yabf {
     /// Construct an empty bit field with enough capacity pre-allocated to store at least `n`
     /// bits.
-    ///
-    /// Will create a heap allocation only if `n` is larger than the inline capacity of the
-    /// internal SmallVec.
     ///
     /// ```
     /// # use yabf::Yabf;
@@ -150,6 +183,7 @@ impl Yabf {
 
 /// Iterator over the bits set to true in the bit field container.
 /// Will iterate over the bits from lowest to to highest.
+/// This is a relatively expensive O(size of container) operation.
 #[derive(Clone)]
 pub struct YabfIterator<'s> {
     yabf: &'s Yabf,
@@ -262,7 +296,8 @@ impl Default for Yabf {
     }
 }
 
-/// bit or assign operation
+/// bit or assign operation.
+/// This is a relatively expensive O(size of container) operation.
 /// ```
 /// # use yabf::Yabf;
 ///
@@ -443,6 +478,7 @@ impl SmallYabf {
 #[cfg(feature = "impl_smallvec")]
 /// Iterator over the bits set to true in the bit field container.
 /// Will iterate over the bits from lowest to to highest.
+/// This is a relatively expensive O(size of container) operation.
 #[derive(Clone)]
 pub struct SmallYabfIterator<'s> {
     yabf: &'s SmallYabf,
@@ -562,6 +598,7 @@ impl Default for SmallYabf {
 
 #[cfg(feature = "impl_smallvec")]
 /// bit or assign operation
+/// This is a relatively expensive O(size of container) operation.
 /// ```
 /// # use yabf::SmallYabf;
 ///

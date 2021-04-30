@@ -7,7 +7,7 @@ fn bench_vec(c: &mut Criterion) {
     println!("running bench with std::vec::Vec");
 
     let mut bf = Yabf::default();
-    c.bench_function("bench1", |b| {
+    c.bench_function("Yabf", |b| {
         b.iter(|| {
             for _ in 0..1000 {
                 for i in (0..2090_usize).rev() {
@@ -34,7 +34,7 @@ fn bench_smallvec(c: &mut Criterion) {
     println!("running bench with Smallvec");
 
     let mut bf = Yabf::default();
-    c.bench_function("bench1", |b| {
+    c.bench_function("SmallYabf", |b| {
         b.iter(|| {
             for _ in 0..1000 {
                 for i in (0..2090_usize).rev() {
@@ -59,7 +59,7 @@ fn bench_smallvec(c: &mut Criterion) {
 #[cfg(test)]
 fn bench_biguint(c: &mut Criterion) {
     let mut bf = num_bigint::BigUint::default();
-    c.bench_function("bench_2", |b| {
+    c.bench_function("BigUint", |b| {
         b.iter(|| {
             for _ in 0..1000 {
                 for i in (0..2090_u64).rev() {

@@ -1,12 +1,13 @@
 [package]
 name = "yabf"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["eadf"]
 edition = "2018"
 description = "yet another bit field"
 readme = "README.md"
 repository = "https://github.com/eadf/yabf.rs"
 license = "MIT OR Apache-2.0"
+keywords = ["bitfield"]
 
 [dependencies]
 smallvec = { version = "^1.6.1", optional = true }
@@ -25,7 +26,6 @@ criterion = "^0.3.4"
 
 [features]
 impl_smallvec = ["smallvec"]
-#extend_one = []
 
 default = ["impl_smallvec"]
 
