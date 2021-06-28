@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: install nightly
-      run: rustup toolchain install nightly
-    - name: Build
-      run: cargo +nightly build --verbose
-    - name: Run tests
-      run: cargo +nightly test --verbose
+      - uses: actions/checkout@v2
+      - name: install nightly
+        run: rustup toolchain install nightly --component rustfmt --allow-downgrade
+      - name: Build
+        run: cargo +nightly build --verbose
+      - name: Run tests
+        run: cargo +nightly test --verbose
