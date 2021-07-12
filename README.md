@@ -40,11 +40,11 @@ assert_eq!(a.bit(12345), false);
 ## Rust cargo
 yabf::SmallYabf is enabled by default, disable like this:
 ```toml
-yabf = {version="^0.1.1",default-features=false}
+yabf = {version="0.1",default-features=false}
 ```
 yabf::SmallYabf is enabled by default
 ```toml
-yabf = {version="^0.1.1"}
+yabf = {version="0.1"}
 ```
 
 
