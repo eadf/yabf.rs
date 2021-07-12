@@ -1,6 +1,6 @@
 [package]
 name = "yabf"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["eadf"]
 edition = "2018"
 description = "yet another bit field"
@@ -19,9 +19,9 @@ path = "src/stress_test.rs"
 [dev-dependencies]
 fnv = "^1.0.7"
 rand = "^0.8.3"
-rand_chacha = "^0.3.0"
-itertools = "^0.10.0"
-num-bigint = "^0.4.0"
+rand_chacha = "0.3"
+itertools = "0.10"
+num-bigint = "0.4"
 criterion = "^0.3.4"
 
 [features]

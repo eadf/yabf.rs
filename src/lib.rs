@@ -44,7 +44,6 @@
 use core::fmt;
 use std::ops;
 
-
 #[derive(Clone)]
 /// Yet another bit field implementation.
 /// This is a simple, small and hopefully efficient bit field implementation.
@@ -128,7 +127,11 @@ impl Yabf {
             for _i in old_word..word - 1 {
                 self.internals.push(0);
             }
-            self.internals.push(bit_mask);
+            if state {
+                self.internals.push(bit_mask);
+            } else {
+                self.internals.push(0);
+            }
         } else if state {
             self.internals[word] |= bit_mask;
         } else {
@@ -422,7 +425,11 @@ impl SmallYabf {
             for _i in old_word..word - 1 {
                 self.internals.push(0);
             }
-            self.internals.push(bit_mask);
+            if state {
+                self.internals.push(bit_mask);
+            } else {
+                self.internals.push(0);
+            }
         } else if state {
             self.internals[word] |= bit_mask;
         } else {
@@ -754,5 +761,31 @@ mod test_small {
         bf.set_bit(29, true);
         bf.set_bit(167, true);
         println!("{:?}", bf.into_iter().collect::<Vec<usize>>());
+    }
+
+    #[test]
+    fn readme_1() {
+        use crate::Yabf;
+        let mut a = Yabf::default();
+        let mut b = Yabf::with_capacity(12345);
+        // bits are false by default
+        assert_eq!(a.bit(45), false);
+        a.set_bit(12345, true);
+        assert_eq!(a.bit(12345), true);
+        b.set_bit(345, true);
+        assert_eq!(b.bit(345), true);
+    }
+
+    #[test]
+    #[cfg(feature = "impl_smallvec")]
+    fn readme_2() {
+        use crate::SmallYabf;
+        let mut a = SmallYabf::default();
+        let mut b = SmallYabf::with_capacity(12345);
+        a.set_bit(45, false);
+        b.set_bit(12345, true);
+        assert_eq!(a.bit(45), false);
+        assert_eq!(b.bit(12345), true);
+        assert_eq!(a.bit(12345), false);
     }
 }
