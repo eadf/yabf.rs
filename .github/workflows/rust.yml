@@ -16,9 +16,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: install nightly
-        run: rustup toolchain install nightly --component rustfmt --allow-downgrade
+      - name: install rust stable
+        run: rustup toolchain install stable --component rustfmt --allow-downgrade
       - name: Build
-        run: cargo +nightly build --verbose
+        run: cargo +stable build --verbose
       - name: Run tests
-        run: cargo +nightly test --verbose
+        run: cargo +stable test --verbose
