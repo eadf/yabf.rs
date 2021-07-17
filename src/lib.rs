@@ -702,6 +702,19 @@ mod test {
         assert!(a.bit(44));
         assert!(a.bit(4444));
     }
+
+    #[test]
+    fn readme_1() {
+        use crate::Yabf;
+        let mut a = Yabf::default();
+        let mut b = Yabf::with_capacity(12345);
+        // bits are false by default
+        assert_eq!(a.bit(45), false);
+        a.set_bit(12345, true);
+        assert_eq!(a.bit(12345), true);
+        b.set_bit(345, true);
+        assert_eq!(b.bit(345), true);
+    }
 }
 
 #[cfg(feature = "smallvec")]
@@ -709,7 +722,6 @@ mod test {
 mod test_small {
 
     #[test]
-    #[cfg(feature = "smallvec")]
     fn test_capacity_0() {
         let mut bf = crate::SmallYabf::default();
 
@@ -733,7 +745,6 @@ mod test_small {
     }
 
     #[test]
-    #[cfg(feature = "smallvec")]
     fn test_capacity_1() {
         let bf = crate::SmallYabf::with_capacity(100);
         assert!(bf.is_empty());
@@ -741,7 +752,6 @@ mod test_small {
     }
 
     #[test]
-    #[cfg(feature = "smallvec")]
     fn test_capacity_2() {
         let mut bf = crate::SmallYabf::default();
         assert!(bf.is_empty());
@@ -752,7 +762,6 @@ mod test_small {
     }
 
     #[test]
-    #[cfg(feature = "smallvec")]
     fn test_iter() {
         let mut bf = crate::SmallYabf::default();
         bf.set_bit(129, true);
@@ -764,20 +773,6 @@ mod test_small {
     }
 
     #[test]
-    fn readme_1() {
-        use crate::Yabf;
-        let mut a = Yabf::default();
-        let mut b = Yabf::with_capacity(12345);
-        // bits are false by default
-        assert_eq!(a.bit(45), false);
-        a.set_bit(12345, true);
-        assert_eq!(a.bit(12345), true);
-        b.set_bit(345, true);
-        assert_eq!(b.bit(345), true);
-    }
-
-    #[test]
-    #[cfg(feature = "smallvec")]
     fn readme_2() {
         use crate::SmallYabf;
         let mut a = SmallYabf::default();
