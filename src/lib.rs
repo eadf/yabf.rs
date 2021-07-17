@@ -21,7 +21,7 @@
 //! ```
 //!
 //! ```{rust}
-//!# #[cfg(feature = "impl_smallvec")] {
+//!# #[cfg(feature = "smallvec")] {
 //! use yabf::SmallYabf;
 //! let mut a = SmallYabf::default();
 //! let mut b = SmallYabf::with_capacity(12345);
@@ -348,12 +348,12 @@ impl ops::BitOrAssign<&Yabf> for Yabf {
 /// It is intended for cases where a program iterates over list or other usize indexed containers
 /// and simple bit based bookkeeping is required.
 ///
-#[cfg(feature = "impl_smallvec")]
+#[cfg(feature = "smallvec")]
 pub struct SmallYabf {
     internals: smallvec::SmallVec<[u32; 4]>,
 }
 
-#[cfg(feature = "impl_smallvec")]
+#[cfg(feature = "smallvec")]
 impl SmallYabf {
     /// Construct an empty bit field with enough capacity pre-allocated to store at least `n`
     /// bits.
@@ -482,7 +482,7 @@ impl SmallYabf {
     }
 }
 
-#[cfg(feature = "impl_smallvec")]
+#[cfg(feature = "smallvec")]
 /// Iterator over the bits set to true in the bit field container.
 /// Will iterate over the bits from lowest to to highest.
 /// This is a relatively expensive O(size of container) operation.
@@ -495,7 +495,7 @@ pub struct SmallYabfIterator<'s> {
     last_bit: usize,
 }
 
-#[cfg(feature = "impl_smallvec")]
+#[cfg(feature = "smallvec")]
 impl<'s> SmallYabfIterator<'s> {
     pub(crate) fn new(yabf: &'s SmallYabf) -> Self {
         Self {
@@ -506,7 +506,7 @@ impl<'s> SmallYabfIterator<'s> {
     }
 }
 
-#[cfg(feature = "impl_smallvec")]
+#[cfg(feature = "smallvec")]
 impl<'a> IntoIterator for &'a SmallYabf {
     type Item = usize;
     type IntoIter = SmallYabfIterator<'a>;
@@ -516,7 +516,7 @@ impl<'a> IntoIterator for &'a SmallYabf {
     }
 }
 
-#[cfg(feature = "impl_smallvec")]
+#[cfg(feature = "smallvec")]
 impl<'s> Iterator for SmallYabfIterator<'s> {
     type Item = usize;
 
@@ -578,7 +578,7 @@ impl<'s> Iterator for SmallYabfIterator<'s> {
     }
 }
 
-#[cfg(feature = "impl_smallvec")]
+#[cfg(feature = "smallvec")]
 impl fmt::Debug for SmallYabf {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.internals.is_empty() {
@@ -593,7 +593,7 @@ impl fmt::Debug for SmallYabf {
     }
 }
 
-#[cfg(feature = "impl_smallvec")]
+#[cfg(feature = "smallvec")]
 impl Default for SmallYabf {
     #[inline]
     fn default() -> Self {
@@ -603,7 +603,7 @@ impl Default for SmallYabf {
     }
 }
 
-#[cfg(feature = "impl_smallvec")]
+#[cfg(feature = "smallvec")]
 /// bit or assign operation
 /// This is a relatively expensive O(size of container) operation.
 /// ```
@@ -704,12 +704,12 @@ mod test {
     }
 }
 
-#[cfg(feature = "impl_smallvec")]
+#[cfg(feature = "smallvec")]
 #[cfg(test)]
 mod test_small {
 
     #[test]
-    #[cfg(feature = "impl_smallvec")]
+    #[cfg(feature = "smallvec")]
     fn test_capacity_0() {
         let mut bf = crate::SmallYabf::default();
 
@@ -733,7 +733,7 @@ mod test_small {
     }
 
     #[test]
-    #[cfg(feature = "impl_smallvec")]
+    #[cfg(feature = "smallvec")]
     fn test_capacity_1() {
         let bf = crate::SmallYabf::with_capacity(100);
         assert!(bf.is_empty());
@@ -741,7 +741,7 @@ mod test_small {
     }
 
     #[test]
-    #[cfg(feature = "impl_smallvec")]
+    #[cfg(feature = "smallvec")]
     fn test_capacity_2() {
         let mut bf = crate::SmallYabf::default();
         assert!(bf.is_empty());
@@ -752,7 +752,7 @@ mod test_small {
     }
 
     #[test]
-    #[cfg(feature = "impl_smallvec")]
+    #[cfg(feature = "smallvec")]
     fn test_iter() {
         let mut bf = crate::SmallYabf::default();
         bf.set_bit(129, true);
@@ -777,7 +777,7 @@ mod test_small {
     }
 
     #[test]
-    #[cfg(feature = "impl_smallvec")]
+    #[cfg(feature = "smallvec")]
     fn readme_2() {
         use crate::SmallYabf;
         let mut a = SmallYabf::default();
