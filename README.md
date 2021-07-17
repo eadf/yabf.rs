@@ -2,7 +2,7 @@
 [![Documentation](https://docs.rs/yabf/badge.svg)](https://docs.rs/yabf)
 [![Workflow](https://github.com/eadf/yabf.rs/workflows/Rust/badge.svg)](https://github.com/eadf/yabf.rs/workflows/Rust/badge.svg)
 [![Workflow](https://github.com/eadf/yabf.rs/workflows/Clippy/badge.svg)](https://github.com/eadf/yabf.rs/workflows/Clippy/badge.svg)
-[![dependency status](https://deps.rs/crate/yabf/0.1.2/status.svg)](https://deps.rs/crate/yabf/0.1.2)
+[![dependency status](https://deps.rs/crate/yabf/0.2.0/status.svg)](https://deps.rs/crate/yabf/0.2.0)
 
 # Yabf
 Just what the world needed - yet another bit field struct.
@@ -40,11 +40,11 @@ assert_eq!(a.bit(12345), false);
 ## Rust cargo
 yabf::SmallYabf is enabled by default, disable like this:
 ```toml
-yabf = {version="0.1",default-features=false}
+yabf = {version="0.2",default-features=false}
 ```
 yabf::SmallYabf is enabled by default
 ```toml
-yabf = {version="0.1"}
+yabf = {version="0.2"}
 ```
 
 
