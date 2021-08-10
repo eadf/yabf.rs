@@ -3,6 +3,7 @@
 [![Workflow](https://github.com/eadf/yabf.rs/workflows/Rust/badge.svg)](https://github.com/eadf/yabf.rs/workflows/Rust/badge.svg)
 [![Workflow](https://github.com/eadf/yabf.rs/workflows/Clippy/badge.svg)](https://github.com/eadf/yabf.rs/workflows/Clippy/badge.svg)
 [![dependency status](https://deps.rs/crate/yabf/0.2.0/status.svg)](https://deps.rs/crate/yabf/0.2.0)
+![license](https://img.shields.io/crates/l/yabf)
 
 # Yabf
 Just what the world needed - yet another bit field struct.
