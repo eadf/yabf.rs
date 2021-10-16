@@ -1,28 +1,29 @@
 [package]
 name = "yabf"
-version = "0.2.0"
-authors = ["eadf"]
+version = "0.3.0"
+authors = ["lacklustr@protonmail.com"]
 edition = "2018"
-description = "yet another bit field"
+description = "yet another (deprecated) bit field"
 readme = "README.md"
 repository = "https://github.com/eadf/yabf.rs"
 license = "MIT OR Apache-2.0"
 keywords = ["bitfield"]
 
 [dependencies]
-smallvec = { version = "^1.6.1", optional = true }
+smallvec = { version = "1.7", optional = true }
 
 [[example]]
 name = "stress_test"
 path = "src/stress_test.rs"
 
 [dev-dependencies]
-fnv = "^1.0.7"
-rand = "^0.8.3"
+fnv = "1.0"
+rand = "0.8"
 rand_chacha = "0.3"
 itertools = "0.10"
 num-bigint = "0.4"
-criterion = "^0.3.4"
+criterion = "0.3"
+vob = "3.0"
 
 [features]
 default = ["smallvec"]
@@ -30,3 +31,6 @@ default = ["smallvec"]
 [[bench]]
 name = "bench"
 harness = false
+
+[badges]
+maintenance = { status = "deprecated" }

@@ -1,3 +1,41 @@
+//! # This crate is deprecated
+//! This crate can be replaced with [vob](https://crates.io/crates/vob) if you add this trait to your code:
+//!```rust
+//! // u32 is slightly faster for random access w/o any bit operations
+//! pub(crate) type VobU32 = vob::Vob<u32>;
+//!
+//! pub(crate) trait GrowingVob {
+//!    /// Will create a new Vob and fill it with `default`
+//!    fn fill(initial_size: usize, default:bool) -> VobU32;
+//!    /// Grow to fit new size, set ´bit´ to ´state´ value
+//!    fn set_grow(&mut self, bit: usize, state: bool) -> bool;
+//!    /// get() with default value `false`
+//!    fn get_f(&self, bit: usize) -> bool;
+//! }
+//!
+//! impl GrowingVob for VobU32 {
+//!    #[inline]
+//!    fn fill(initial_size: usize, default:bool) -> Self {
+//!        let mut v = Self::new_with_storage_type(0);
+//!        v.resize(initial_size, default);
+//!        v
+//!    }
+//!
+//!    #[inline]
+//!    fn set_grow(&mut self, bit: usize, state: bool) -> bool {
+//!        if bit >= self.len() {
+//!            self.resize(bit + 64, false);
+//!        }
+//!        self.set(bit, state)
+//!    }
+//!
+//!    #[inline]
+//!    fn get_f(&self, bit: usize) -> bool {
+//!        self.get(bit).unwrap_or(false)
+//!    }
+//!}
+//!```
+//!
 //! # Yabf
 //! Just what the world needed - yet another bit field struct.
 //!
@@ -44,7 +82,7 @@
 use core::fmt;
 use std::ops;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 /// Yet another bit field implementation.
 /// This is a simple, small and hopefully efficient bit field implementation.
 ///
@@ -290,15 +328,6 @@ impl fmt::Debug for Yabf {
     }
 }
 
-impl Default for Yabf {
-    #[inline]
-    fn default() -> Self {
-        Self {
-            internals: Vec::<u32>::default(),
-        }
-    }
-}
-
 /// bit or assign operation.
 /// This is a relatively expensive O(size of container) operation.
 /// ```
@@ -340,7 +369,7 @@ impl ops::BitOrAssign<&Yabf> for Yabf {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 /// Yet another bit field implementation.
 /// This is a simple, small and hopefully efficient bit field implementation. It uses SmallVec
 /// as an internal container. The first 128 bits will be stored on the stack.
@@ -589,16 +618,6 @@ impl fmt::Debug for SmallYabf {
                 write!(f, "{:08X}_", *i)?;
             }
             Ok(())
-        }
-    }
-}
-
-#[cfg(feature = "smallvec")]
-impl Default for SmallYabf {
-    #[inline]
-    fn default() -> Self {
-        Self {
-            internals: smallvec::SmallVec::<[u32; 4]>::default(),
         }
     }
 }
